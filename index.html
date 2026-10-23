@@ -95,7 +95,7 @@ const categoryInfo=[
  {id:"pengembangan",name:"Pengembangan Diri",desc:"Tujuan, kemampuan, pengalaman, dan tekanan kerja."},
  {id:"kehidupan",name:"Kehidupan & Masyarakat",desc:"Kesehatan, budaya, lingkungan, dan kehidupan sehari-hari."}
 ];
-let bank=[],state={opened:[],session:null,sessions:[],lastSummary:null},activeMode="answer",speed=1,toastTimer=null;
+let bank=[],pendingReview=0,state={opened:[],session:null,sessions:[],lastSummary:null},activeMode="answer",speed=1,toastTimer=null;
 const $=id=>document.getElementById(id);
 function safeLoad(){try{const x=JSON.parse(localStorage.getItem(STORAGE)||"{}");if(Array.isArray(x.opened))state.opened=x.opened;if(Array.isArray(x.sessions))state.sessions=x.sessions;if(x.session&&typeof x.session==="object")state.session=x.session;if(x.lastSummary)state.lastSummary=x.lastSummary;}catch(e){}}
 function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));}catch(e){notify("Penyimpanan browser penuh atau tidak tersedia. Ekspor progres sebagai cadangan.");}}
@@ -117,7 +117,7 @@ function renderHome(){
  const s=state.session;
  if(s&&!s.done&&Array.isArray(s.order)&&s.order.length){$("resumeBox").classList.remove("hidden");const q=qById(s.order[s.index]);$("resumeText").textContent=(s.mode==="translation"?"Latihan Terjemahan":"Jawab dalam Mandarin")+" · "+(s.category==="all"?"Semua kategori":categoryName(s.category))+" · soal "+Math.min(s.index+1,s.order.length)+" dari "+s.order.length+(q?" — "+q.question:"");}
  else $("resumeBox").classList.add("hidden");
- $("bankStatus").textContent=bank.length+" soal siap digunakan. Kemajuan disimpan di browser ini. Materi yang belum memiliki pinyin atau arti lengkap akan ditandai saat dibuka.";
+ $("bankStatus").textContent=bank.length+" soal siap digunakan. "+pendingReview+" soal lain ditahan untuk peninjauan karena materi sumber belum lengkap. Kemajuan disimpan di browser ini.";
 }
 function shuffled(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function buildOrder(category,firstId){
@@ -227,7 +227,7 @@ function importProgress(file){
 function resetProgress(){if(!confirm("Hapus semua riwayat soal dan sesi latihan? Bank soal serta pilihan tema tidak akan dihapus."))return;state={opened:[],session:null,sessions:[],lastSummary:null};save();notify("Progres telah direset.");goHome();}
 async function init(){
  safeLoad();try{const t=localStorage.getItem(THEME);if(t==="dark"||t==="light")setTheme(t);}catch(e){}
- try{const res=await fetch("./questions.json",{cache:"no-cache"});if(!res.ok)throw new Error("HTTP "+res.status);const json=await res.json();bank=Array.isArray(json.questions)?json.questions:[];if(!bank.length)throw new Error("Bank soal kosong");}
+ try{const res=await fetch("./questions.json",{cache:"no-cache"});if(!res.ok)throw new Error("HTTP "+res.status);const json=await res.json();const allQuestions=Array.isArray(json.questions)?json.questions:[];pendingReview=allQuestions.filter(q=>q.review).length;bank=allQuestions.filter(q=>!q.review);if(!bank.length)throw new Error("Belum ada soal siap digunakan");}
  catch(e){$("bankStatus").textContent="Bank soal gagal dimuat. Pastikan index.html dan questions.json berada di folder yang sama dan GitHub Pages sudah aktif.";notify("Bank soal belum dapat dimuat.");return;}
  state.opened=state.opened.filter(id=>qById(id));renderHome();
  document.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>{activeMode=b.dataset.mode;renderHome();$("categoryHint").scrollIntoView({behavior:"smooth",block:"center"});notify("Mode dipilih: "+(activeMode==="answer"?"Jawab dalam Mandarin":"Latihan Terjemahan"));}));
