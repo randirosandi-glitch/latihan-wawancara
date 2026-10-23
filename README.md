@@ -30,7 +30,7 @@ Kemudian buka `http://localhost:8000`.
 
 ## Publikasi GitHub Pages
 
-Workflow `.github/workflows/deploy-pages.yml` mencoba mengaktifkan GitHub Pages dan menerbitkan situs secara otomatis setiap kali ada perubahan ke branch `main`. Buka tab **Actions** untuk memeriksa hasil deployment. Jika GitHub menolak pengaktifan otomatis, buka **Settings → Pages** dan pilih **GitHub Actions** sebagai sumber deployment.
+Untuk menerbitkan situs, buka **Settings → Pages** pada repository dan pilih **GitHub Actions** sebagai sumber deployment. Setelah disimpan, buka tab **Actions** dan jalankan ulang workflow deployment yang gagal sebelumnya. Sesudah itu, setiap perubahan ke branch `main` akan memicu deployment otomatis.
 
 ## Catatan privasi
 
