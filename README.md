@@ -28,9 +28,9 @@ python -m http.server 8000
 
 Kemudian buka `http://localhost:8000`.
 
-## Mengaktifkan GitHub Pages
+## Publikasi GitHub Pages
 
-Di repository GitHub, buka **Settings → Pages**, pilih **Deploy from a branch**, pilih branch `main` dan folder `/(root)`, lalu simpan. Setelah publikasi selesai, URL situs akan ditampilkan pada halaman Pages.
+Workflow `.github/workflows/deploy-pages.yml` mencoba mengaktifkan GitHub Pages dan menerbitkan situs secara otomatis setiap kali ada perubahan ke branch `main`. Buka tab **Actions** untuk memeriksa hasil deployment. Jika GitHub menolak pengaktifan otomatis, buka **Settings → Pages** dan pilih **GitHub Actions** sebagai sumber deployment.
 
 ## Catatan privasi
 
